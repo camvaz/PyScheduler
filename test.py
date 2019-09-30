@@ -73,6 +73,17 @@ class Utils:
             # PRIORIDAD DESCENDENTE, LLEGADA DESCENDENTE, EJECUCION DESCENDENTE, ID DESCENDENTE 
             container.sort(key=lambda x:(-x.prio,-x.exe,-x.lle,-Utils.pidtoint(x.name)));
 
+        @staticmethod
+        def tablaHasExecutions(container):
+            for i in container:
+            if(i.exe > 0):
+                return true;
+        return false;
+
+        @staticmethod
+        def vaciarCola(container, boolean):
+            for i in container
+                
 
 
 class Proceso:
@@ -83,6 +94,7 @@ class Proceso:
         self.prio = prioridad;
         self.ram = nram;
         self.espera = 0;
+        self.vuelta = 0;
 
     def __eq__(self, o):
         return self.name == o.name;
@@ -93,12 +105,13 @@ class Proceso:
 
 class Scheduler:
     procesos = [];
-    def __init__(self, filename):
+    def __init__(self, nram, filename):
         self.name = "Planificador de procesos.";
+        self.ram = nram;
         f = open(filename);
 
         for line in f:
-            arrdata = line.split("  "); 
+            arrdata = line.split(","); 
             name = arrdata.pop(0); arrdata.pop();
             for i in range(len(arrdata)):
                 arrdata[i] = int(arrdata[i]);
@@ -107,12 +120,6 @@ class Scheduler:
 
         f.close();
 
-    def tablaHasExecutions(self):
-        for i in self.procesos:
-            if(i.exe > 0):
-                return true;
-        return false;
-
     def printpids(self):
         print("\t\t    TABLA DE PROCESOS\n");
         print("Nombre\tLlegada\tEjecucion\tPrioridad\tRam\tEspera")
@@ -120,30 +127,51 @@ class Scheduler:
             print(i.print());
 
     def run(self,args,canales):
-        tabla = procesos[:];
+        tabla=[];
+
+        for i in self.procesos:
+            if i.ram <= self.ram:
+                tabla.append(i);
+            else:
+                i.espera = "NA";
+
         llegadas = []
         cola = [];
+        generacion = [];
         tiempo = 0;
+        vueltaCola = 0;        
 
-        while(self.tablaHasExecutions()):                    
+        while(Util.tablaHasExecutions(tabla)):                    
+
+
             for i in tabla:
                 if i.lle == tiempo:
                     llegadas.append(i);
-            
+
             Utils.sorttabla(llegadas, args);
-            
-            for i in llegadas[0:canales]:
-                i.exe -= 1;
-                if(i.exe == 0):
-                    for j in tabla:
-                        if i == j:
-                            j.espera = tiempo - j.lle;
 
-                    llegadas.remove(i);
-                else:
+            residuo = self.ram;
+
+            for i in range(canales):
                 
+                if llegadas[i].ram <= residuo:
+                    residuo -= llegadas[i].ram;
+                    llegadas[i].exe -= 1;
+                    if(llegadas[i].exe == 0):
+                        for j in tabla:
+                            if j.id = llegadas[i].id:
+                                j.esp = tiempo - j.lle - j.exe;
+                    else:
+                        cola.append(llegadas[i]);
+                        generacion.append(llegadas.pop(i));
 
 
+
+            tiempo+=1;
+
+
+
+                                
 
 
 
@@ -158,4 +186,5 @@ def main():
 
 
     plani.printpids();
+
 main();
