@@ -76,9 +76,9 @@ class Utils:
         @staticmethod
         def tablaHasExecutions(container):
             for i in container:
-            if(i.exe > 0):
-                return true;
-        return false;
+                if i.espera != 0:
+                    return true;
+            return false;
 
         @staticmethod
         def vaciarCola(container, boolean):
@@ -126,15 +126,15 @@ class Scheduler:
         for i in self.procesos:
             print(i.print());
 
-    def run(self,args,canales):
+    def run(self,args,canales,ram):
         tabla=[];
 
         for i in self.procesos:
-            if i.ram <= self.ram:
+            if i.ram <= ram:
                 tabla.append(i);
             else:
                 i.espera = "NA";
-
+        channels = canales;
         llegadas = []
         cola = [];
         generacion = [];
@@ -143,30 +143,32 @@ class Scheduler:
 
         while(Util.tablaHasExecutions(tabla)):                    
 
-
+            
             for i in tabla:
                 if i.lle == tiempo:
                     llegadas.append(i);
 
             Utils.sorttabla(llegadas, args);
-
-            residuo = self.ram;
-
-            for i in range(canales):
-                
-                if llegadas[i].ram <= residuo:
-                    residuo -= llegadas[i].ram;
-                    llegadas[i].exe -= 1;
-                    if(llegadas[i].exe == 0):
+            channels = canales;
+            residuo = ram;
+            itr = 0;
+ 
+            while itr < channels:                
+                if llegadas[itr].ram <= residuo:
+                    residuo -= llegadas[itr].ram;
+                    generacion.append(llegadas[itr]));
+                    llegadas[itr].exe -= 1;
+                    if(llegadas[itr].exe == 0):
                         for j in tabla:
-                            if j.id = llegadas[i].id:
+                            if j.id = llegadas[itr].id:
                                 j.esp = tiempo - j.lle - j.exe;
+                        llegadas.pop(itr);
                     else:
-                        cola.append(llegadas[i]);
-                        generacion.append(llegadas.pop(i));
-
-
-
+                        cola.append(llegadas[itr]);
+                    channels-=1;
+                    itr-=1;  
+                itr+=1;                                    
+            
             tiempo+=1;
 
 
